@@ -118,7 +118,7 @@ def auth_google_callback():
 def logout():
     session.clear()
     flash('You have been logged out successfully.', 'info')
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 @app.route('/profile')
 @login_required
