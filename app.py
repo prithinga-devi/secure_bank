@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 from datetime import timedelta
 from utils.auth import login_required, role_required
@@ -7,6 +8,11 @@ from analytics.daily import get_dashboard_stats, get_last_7_days_stats, get_nump
 from analytics.monthly import get_monthly_analytics, get_top_customers, get_biggest_transactions, get_inactive_customers, get_peak_banking_hours
 from analytics.reports import export_csv, export_excel, export_pdf
 from flask import Response, jsonify
+
+# Auto-initialize database if missing
+if not os.path.exists('database.db'):
+    from init_db import init_db
+    init_db()
 
 app = Flask(__name__)
 app.secret_key = 'smart_banking_secure_key_1984'
