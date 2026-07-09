@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SecureBank{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Header -->
+    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1 text-light">Hello, {{ session.get('full_name') }}</h1>
+            <p class="text-secondary mb-0">Account: <strong class="text-info">{{ user.account_number }}</strong></p>
+        </div>
+        <div class="text-end">
+            <p class="text-secondary mb-1">Available Balance</p>
+            <h2 class="fw-bold text-success mb-0">₹{{ "{:,.2f}".format(user.balance) }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card glass-panel p-4 mb-4">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs border-bottom-0 mb-4" id="dashboardTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active bg-transparent border-0 fs-5 fw-bold px-3 py-2" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                        <i class="fa-solid fa-house-chimney me-2"></i>Overview
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link bg-transparent border-0 fs-5 fw-bold px-3 py-2" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
+                        <i class="fa-solid fa-shield-halved me-2"></i>Security
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="dashboardTabContent">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                    
+                    <!-- Quick Actions -->
+                    <h4 class="mb-3 text-light fw-semibold">Quick Actions</h4>
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-4">
+                            <a href="{{ url_for('deposit_page') }}" class="btn btn-premium btn-premium-secondary w-100 py-3 text-start d-flex align-items-center">
+                                <i class="fa-solid fa-arrow-down-long text-success me-3 fs-3"></i>
+                                <div>
+                                    <span class="d-block fw-bold fs-5">Deposit</span>
+                                    <small class="text-secondary">Add funds to account</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ url_for('withdraw_page') }}" class="btn btn-premium btn-premium-secondary w-100 py-3 text-start d-flex align-items-center">
+                                <i class="fa-solid fa-arrow-up-long text-pink me-3 fs-3"></i>
+                                <div>
+                                    <span class="d-block fw-bold fs-5">Withdraw</span>
+                                    <small class="text-secondary">Take out cash</small>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ url_for('transfer_page') }}" class="btn btn-premium btn-premium-secondary w-100 py-3 text-start d-flex align-items-center">
+                                <i class="fa-solid fa-money-bill-transfer text-info me-3 fs-3"></i>
+                                <div>
+                                    <span class="d-block fw-bold fs-5">Transfer</span>
+                                    <small class="text-secondary">Send money to others</small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions List -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+                        <h4 class="text-light fw-semibold mb-0">Recent Transactions</h4>
+                        <a href="{{ url_for('transactions_page') }}" class="btn btn-sm btn-outline-info rounded-pill px-3">View All</a>
+                    </div>
+                    
+                    {% if transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-glass align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Balance After</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for txn in transactions %}
+                                <tr>
+                                    <td><small class="text-secondary">{{ txn.transaction_id[:8] }}...</small></td>
+                                    <td>{{ txn.transaction_date[:16] }}</td>
+                                    <td>
+                                        {% if txn.transaction_type == 'deposit' %}
+                                            <span class="badge badge-txn badge-txn-deposit">
+                                                <i class="fa-solid fa-circle-down me-1"></i>Deposit
+                                            </span>
+                                        {% elif txn.transaction_type == 'withdraw' %}
+                                            <span class="badge badge-txn badge-txn-withdraw">
+                                                <i class="fa-solid fa-circle-up me-1"></i>Withdraw
+                                            </span>
+                                        {% elif txn.transaction_type == 'transfer' %}
+                                            <span class="badge badge-txn badge-txn-transfer">
+                                                <i class="fa-solid fa-paper-plane me-1"></i>Transfer
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="fw-semibold">
+                                        {% if txn.transaction_type == 'deposit' %}
+                                            <span class="text-success">+₹{{ "{:,.2f}".format(txn.amount) }}</span>
+                                        {% elif txn.transaction_type == 'withdraw' %}
+                                            <span class="text-pink">-₹{{ "{:,.2f}".format(txn.amount) }}</span>
+                                        {% elif txn.transaction_type == 'transfer' %}
+                                            <span class="text-info">₹{{ "{:,.2f}".format(txn.amount) }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if txn.status == 'success' %}
+                                            <span class="badge badge-glass badge-glass-success">Success</span>
+                                        {% else %}
+                                            <span class="badge badge-glass badge-glass-danger">Failed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>₹{{ "{:,.2f}".format(txn.balance_after_transaction) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 text-secondary">
+                        <div class="fs-1 mb-3">📜</div>
+                        <p class="mb-0">No transactions recorded yet.</p>
+                        <small class="d-block mt-1">Make a deposit to get started.</small>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Security Tab (Login History) -->
+                <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+                    <h4 class="mb-3 text-light fw-semibold">Login History</h4>
+                    <p class="text-secondary mb-4">Review your recent login activity to ensure account security. SecureBank uses Google OAuth 2.0 for maximum security.</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-glass align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Device</th>
+                                    <th>Browser</th>
+                                    <th>Location</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lh in login_history %}
+                                <tr>
+                                    <td>{{ lh.login_date[:19] }}</td>
+                                    <td><i class="fa-solid fa-desktop me-2 text-secondary"></i> {{ lh.device or 'Unknown' }}</td>
+                                    <td><i class="fa-brands fa-chrome me-2 text-info"></i> {{ lh.browser or 'Unknown' }}</td>
+                                    <td><i class="fa-solid fa-location-dot text-danger me-2"></i> {{ lh.location or 'Localhost' }} <small class="text-muted">({{ lh.ip_address }})</small></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-secondary">No login history available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

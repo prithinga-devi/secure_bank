@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}403 Forbidden - SecureBank{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="col-md-6 text-center">
+        <h1 class="display-1 text-danger fw-bold"><i class="bi bi-shield-lock"></i> 403</h1>
+        <h2 class="mb-4 text-light">Access Denied</h2>
+        <p class="lead text-secondary mb-5">You are not authorized to access this page.</p>
+        
+        {% if session.get('role') == 'customer' %}
+            <a href="{{ url_for('customer_dashboard') }}" class="btn btn-premium btn-premium-primary">
+                <i class="bi bi-house"></i> Return to Dashboard
+            </a>
+        {% elif session.get('role') == 'manager' %}
+            <a href="{{ url_for('manager_dashboard') }}" class="btn btn-premium btn-premium-primary">
+                <i class="bi bi-house"></i> Return to Dashboard
+            </a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-premium btn-premium-primary">
+                <i class="bi bi-box-arrow-in-right"></i> Go to Login
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

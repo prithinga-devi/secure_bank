@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Transaction History - SecureBank{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Back Navigation -->
+    <div class="col-12 mb-3">
+        <a href="{{ url_for('customer_dashboard') }}" class="btn btn-premium btn-premium-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Header -->
+    <div class="col-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold text-light mb-1"><i class="fa-solid fa-receipt me-2"></i>Transaction History</h2>
+            <p class="text-secondary mb-0">View and filter all your banking operations</p>
+        </div>
+        <div class="badge badge-glass badge-glass-success fs-6">
+            Balance: ₹{{ "{:,.2f}".format(balance) }}
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="col-12 mb-4">
+        <div class="card glass-panel p-3">
+            <form method="GET" action="{{ url_for('transactions_page') }}" class="row g-3 align-items-end">
+                <!-- Type Filter -->
+                <div class="col-md-3">
+                    <label for="filterType" class="form-label text-secondary fw-semibold small mb-1">Filter by Type</label>
+                    <select class="form-select form-glass" id="filterType" name="type">
+                        <option value="" {% if not filter_type %}selected{% endif %}>All Transactions</option>
+                        <option value="deposit" {% if filter_type == 'deposit' %}selected{% endif %}>Deposits</option>
+                        <option value="withdraw" {% if filter_type == 'withdraw' %}selected{% endif %}>Withdrawals</option>
+                        <option value="transfer" {% if filter_type == 'transfer' %}selected{% endif %}>Transfers</option>
+                    </select>
+                </div>
+                <!-- Search -->
+                <div class="col-md-5">
+                    <label for="searchQuery" class="form-label text-secondary fw-semibold small mb-1">Search</label>
+                    <input type="text" class="form-control form-glass" id="searchQuery" name="search"
+                           placeholder="Search by TXN ID or remarks..." value="{{ search_query }}">
+                </div>
+                <!-- Buttons -->
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-premium btn-premium-primary flex-grow-1">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+                    </button>
+                    <a href="{{ url_for('transactions_page') }}" class="btn btn-premium btn-premium-secondary">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="col-12">
+        <div class="card glass-panel p-4">
+            {% if transactions %}
+            <div class="table-responsive">
+                <table class="table table-glass align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>TXN ID</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Balance After</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for txn in transactions %}
+                        <tr>
+                            <td class="text-nowrap">
+                                <small class="text-secondary">{{ txn.transaction_date[:16] if txn.transaction_date else 'N/A' }}</small>
+                            </td>
+                            <td>
+                                <code class="text-info">{{ txn.transaction_id }}</code>
+                            </td>
+                            <td>
+                                {% if txn.transaction_type == 'deposit' %}
+                                    <span class="badge badge-txn badge-txn-deposit">
+                                        <i class="fa-solid fa-circle-down me-1"></i>Deposit
+                                    </span>
+                                {% elif txn.transaction_type == 'withdraw' %}
+                                    <span class="badge badge-txn badge-txn-withdraw">
+                                        <i class="fa-solid fa-circle-up me-1"></i>Withdraw
+                                    </span>
+                                {% elif txn.transaction_type == 'transfer' %}
+                                    <span class="badge badge-txn badge-txn-transfer">
+                                        <i class="fa-solid fa-paper-plane me-1"></i>Transfer
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="fw-semibold">
+                                {% if txn.transaction_type == 'deposit' %}
+                                    <span class="text-success">+₹{{ "{:,.2f}".format(txn.amount) }}</span>
+                                {% elif txn.transaction_type == 'withdraw' %}
+                                    <span class="text-pink">-₹{{ "{:,.2f}".format(txn.amount) }}</span>
+                                {% elif txn.transaction_type == 'transfer' %}
+                                    <span class="text-indigo">₹{{ "{:,.2f}".format(txn.amount) }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if txn.status == 'success' %}
+                                    <span class="badge badge-glass badge-glass-success">Success</span>
+                                {% else %}
+                                    <span class="badge badge-glass badge-glass-danger">Failed</span>
+                                {% endif %}
+                            </td>
+                            <td>₹{{ "{:,.2f}".format(txn.balance_after_transaction) }}</td>
+                            <td>
+                                <small class="text-secondary">{{ txn.remarks if txn.remarks else '—' }}</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center mt-3 text-secondary small">
+                Showing {{ transactions|length }} transaction{{ 's' if transactions|length != 1 else '' }}
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-secondary">
+                <div class="fs-1 mb-3">📜</div>
+                {% if filter_type or search_query %}
+                    <p class="mb-0">No transactions match your filter.</p>
+                    <a href="{{ url_for('transactions_page') }}" class="btn btn-premium btn-premium-secondary btn-sm mt-3">Clear Filters</a>
+                {% else %}
+                    <p class="mb-0">No transactions recorded yet.</p>
+                    <small class="d-block mt-1">Make a deposit or transfer to see operations here.</small>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - SecureBank</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-light analytics-body">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('manager_dashboard') }}">SecureBank</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('manager_dashboard') }}">Manager Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('analytics_dashboard') }}">Analytics</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center text-white">
+                <span class="me-3"><i class="bi bi-person-circle"></i> {{ session.get('full_name') }} (Manager)</span>
+                
+                <button class="btn btn-outline-light btn-sm me-3" id="darkModeToggle">
+                    <i class="bi bi-moon"></i> Dark Mode
+                </button>
+                
+                <div class="position-relative me-4">
+                    <i class="bi bi-bell fs-5"></i>
+                    {% if stats.fraud_alerts > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ stats.fraud_alerts }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Banking Analytics</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('export_report', format='csv') }}" class="btn btn-outline-primary"><i class="bi bi-filetype-csv"></i> CSV</a>
+            <a href="{{ url_for('export_report', format='excel') }}" class="btn btn-outline-success"><i class="bi bi-file-earmark-excel"></i> Excel</a>
+            <a href="{{ url_for('export_report', format='pdf') }}" class="btn btn-outline-danger"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
+        </div>
+    </div>
+
+    <!-- Top Cards -->
+    <div class="row mb-4">
+        <div class="col-md-2 col-sm-4 mb-3">
+            <div class="card stat-card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-people text-primary fs-3"></i>
+                    <h6 class="card-title mt-2 text-muted">Customers</h6>
+                    <h4>{{ stats.total_customers }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 mb-3">
+            <div class="card stat-card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-credit-card text-info fs-3"></i>
+                    <h6 class="card-title mt-2 text-muted">Today's Txns</h6>
+                    <h4>{{ stats.today_transactions }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 mb-3">
+            <div class="card stat-card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-arrow-down-circle text-success fs-3"></i>
+                    <h6 class="card-title mt-2 text-muted">Today's Deposits</h6>
+                    <h4>₹{{ "{:,.0f}".format(stats.today_deposits) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 mb-3">
+            <div class="card stat-card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-arrow-up-circle text-warning fs-3"></i>
+                    <h6 class="card-title mt-2 text-muted">Today's Withdrawals</h6>
+                    <h4>₹{{ "{:,.0f}".format(stats.today_withdrawals) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 mb-3">
+            <div class="card stat-card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-bank text-primary fs-3"></i>
+                    <h6 class="card-title mt-2 text-muted">Bank Balance</h6>
+                    <h4>₹{{ "{:,.0f}".format(stats.current_bank_balance) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4 mb-3">
+            <div class="card stat-card shadow-sm text-center h-100 border-danger">
+                <div class="card-body">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
+                    <h6 class="card-title mt-2 text-danger">Fraud Alerts</h6>
+                    <h4 class="text-danger">{{ stats.fraud_alerts }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-primary text-white">NumPy Stats</div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Avg Txn <span>₹{{ "{:,.0f}".format(numpy_stats.get('average_transaction', 0)) }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Max Txn <span>₹{{ "{:,.0f}".format(numpy_stats.get('max_transaction', 0)) }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Median Txn <span>₹{{ "{:,.0f}".format(numpy_stats.get('median_transaction', 0)) }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Deposits <span>₹{{ "{:,.0f}".format(numpy_stats.get('total_deposits', 0)) }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Withdrawals <span>₹{{ "{:,.0f}".format(numpy_stats.get('total_withdrawals', 0)) }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Highest Balance <span>₹{{ "{:,.0f}".format(numpy_stats.get('highest_balance', 0)) }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <!-- Charts Section -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white">Daily Transactions</div>
+                        <div class="card-body">
+                            <canvas id="dailyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white">Transaction Types</div>
+                        <div class="card-body">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white">Monthly Growth (Deposits vs Withdrawals)</div>
+                        <div class="card-body">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data Tables -->
+    <div class="row">
+        <!-- Top Customers -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">Top Customers</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Balance</th>
+                                    <th>Txns</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cust in top_customers %}
+                                <tr>
+                                    <td>{{ cust.full_name }}<br><small class="text-muted">{{ cust.account_number }}</small></td>
+                                    <td>₹{{ "{:,.2f}".format(cust.balance) }}</td>
+                                    <td>{{ cust.txn_count }}</td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="3" class="text-center">No data available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Biggest Transactions -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">Biggest Transactions</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for txn in biggest_txns %}
+                                <tr>
+                                    <td>{{ txn.customer }}</td>
+                                    <td class="text-danger fw-bold">₹{{ "{:,.2f}".format(txn.amount) }}</td>
+                                    <td><span class="badge {% if txn.transaction_type == 'deposit' %}bg-success{% elif txn.transaction_type == 'withdraw' %}bg-warning text-dark{% else %}bg-primary{% endif %}">{{ txn.transaction_type|capitalize }}</span></td>
+                                    <td>{{ txn.transaction_date[:10] }}</td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="4" class="text-center">No data available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Inactive Customers -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">Inactive Customers (>30 Days)</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Last Login</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cust in inactive_customers %}
+                                <tr>
+                                    <td>{{ cust.full_name }}<br><small class="text-muted">{{ cust.account_number }}</small></td>
+                                    <td>{{ cust.last_login or 'Never' }}</td>
+                                    <td>₹{{ "{:,.2f}".format(cust.balance) }}</td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="3" class="text-center text-success py-3"><i class="bi bi-check-circle"></i> All customers are active</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Peak Banking Hours -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">Peak Banking Hours</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Hour</th>
+                                    <th>Transactions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pk in peak_hours %}
+                                <tr>
+                                    <td><strong>{{ pk.hour_label }}</strong></td>
+                                    <td>{{ pk.count }}</td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="2" class="text-center">No data available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dark mode logic
+    const toggleBtn = document.getElementById('darkModeToggle');
+    const body = document.body;
+    
+    toggleBtn.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        if(body.classList.contains('dark-mode')) {
+            toggleBtn.innerHTML = '<i class="bi bi-sun"></i> Light Mode';
+        } else {
+            toggleBtn.innerHTML = '<i class="bi bi-moon"></i> Dark Mode';
+        }
+    });
+
+    // Fetch and render charts
+    fetch("{{ url_for('api_analytics_data') }}")
+        .then(response => response.json())
+        .then(data => {
+            // Daily Chart
+            const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+            
+            // For daily, data.daily is array of {day, date, transactions}
+            // Reverse so oldest is first
+            const dailyData = data.daily.reverse();
+            new Chart(dailyCtx, {
+                type: 'bar',
+                data: {
+                    labels: dailyData.map(d => d.day),
+                    datasets: [{
+                        label: 'Transactions',
+                        data: dailyData.map(d => d.transactions),
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+
+            // Pie Chart (Transaction Types)
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            const totals = data.stats;
+            new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Deposits', 'Withdrawals'],
+                    datasets: [{
+                        data: [totals.total_deposits, totals.total_withdrawals],
+                        backgroundColor: ['#28a745', '#ffc107']
+                    }]
+                }
+            });
+
+            // Monthly Chart
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            const monthlyData = data.monthly;
+            new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyData.map(d => d.month),
+                    datasets: [
+                        {
+                            label: 'Deposits',
+                            data: monthlyData.map(d => d.deposits),
+                            borderColor: '#28a745',
+                            tension: 0.1,
+                            fill: false
+                        },
+                        {
+                            label: 'Withdrawals',
+                            data: monthlyData.map(d => d.withdrawals),
+                            borderColor: '#ffc107',
+                            tension: 0.1,
+                            fill: false
+                        }
+                    ]
+                }
+            });
+        });
+        
+    // Live refresh every 60 seconds
+    setInterval(() => {
+        window.location.reload();
+    }, 60000);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

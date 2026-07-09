@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Withdraw Money - SecureBank{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <!-- Back Navigation -->
+    <div class="col-lg-8 mb-3">
+        <a href="{{ url_for('customer_dashboard') }}" class="btn btn-premium btn-premium-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Withdraw Form -->
+    <div class="col-lg-8">
+        <div class="card glass-panel p-4 p-md-5">
+            <div class="text-center mb-4">
+                <div class="txn-icon-circle txn-icon-withdraw mx-auto mb-3">
+                    <i class="fa-solid fa-circle-up"></i>
+                </div>
+                <h2 class="fw-bold text-light">Withdraw Money</h2>
+                <p class="text-secondary mb-0">Withdraw funds from your account</p>
+            </div>
+
+            <!-- Current Balance Display -->
+            <div class="balance-strip mb-4">
+                <span class="text-secondary"><i class="fa-solid fa-wallet me-2"></i>Current Balance</span>
+                <span class="fw-bold fs-5">₹{{ "{:,.2f}".format(balance) }}</span>
+            </div>
+
+            {% if result %}
+            <!-- Success Result Card -->
+            <div class="result-card result-card-success mb-4 animate-fade-in">
+                <div class="text-center">
+                    <div class="result-icon mb-3">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Withdrawal Successful!</h4>
+                    <p class="text-secondary mb-3">Funds have been deducted</p>
+                    <div class="result-amount mb-3">₹{{ "{:,.2f}".format(result.amount) }}</div>
+                    <div class="row g-3 justify-content-center">
+                        <div class="col-auto">
+                            <div class="result-detail">
+                                <span class="label">New Balance</span>
+                                <span class="value">₹{{ "{:,.2f}".format(result.new_balance) }}</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="result-detail">
+                                <span class="label">Reference ID</span>
+                                <span class="value">{{ result.transaction_id }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('withdraw_page') }}" id="withdrawForm">
+                <!-- Amount -->
+                <div class="mb-4">
+                    <label for="amount" class="form-label text-secondary fw-semibold">
+                        <i class="fa-solid fa-indian-rupee-sign me-1"></i> Amount
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text form-glass border-end-0 fw-bold">₹</span>
+                        <input type="number" class="form-control form-glass border-start-0" id="amount" name="amount"
+                               placeholder="Enter amount" min="1" step="0.01" required>
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="mb-4">
+                    <label for="category" class="form-label text-secondary fw-semibold">
+                        <i class="fa-solid fa-tag me-1"></i> Category
+                    </label>
+                    <select class="form-select form-glass" id="category" name="category">
+                        <option value="General">General</option>
+                        <option value="ATM">ATM</option>
+                        <option value="Bills">Bills</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Remarks -->
+                <div class="mb-4">
+                    <label for="remarks" class="form-label text-secondary fw-semibold">
+                        <i class="fa-solid fa-comment me-1"></i> Remarks <span class="text-secondary fw-normal">(Optional)</span>
+                    </label>
+                    <textarea class="form-control form-glass" id="remarks" name="remarks" rows="2"
+                              placeholder="Add a note for this transaction..."></textarea>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-premium btn-premium-pink w-100 py-3 fs-5">
+                    <i class="fa-solid fa-circle-up me-2"></i> Withdraw
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

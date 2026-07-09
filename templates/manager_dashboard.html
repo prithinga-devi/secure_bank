@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Manager Dashboard - SecureBank{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Header -->
+    <div class="col-12 mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="fw-bold mb-1 text-light">Welcome, {{ session.get('full_name') }}</h1>
+            <p class="text-secondary mb-0">System Overview and Risk Analytics Dashboard.</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <a href="{{ url_for('analytics_dashboard') }}" class="btn btn-premium btn-premium-primary me-3">
+                <i class="fa-solid fa-chart-line me-1"></i> Open Analytics
+            </a>
+            <div class="badge badge-glass badge-glass-danger fs-6">
+                <i class="fa-solid fa-user-tie me-1"></i> System Manager
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row g-4 mb-5">
+    <!-- Total Customers -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card glass-panel card-kpi blue p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-secondary fw-semibold">Total Customers</span>
+                <span class="fs-4 text-info"><i class="fa-solid fa-users"></i></span>
+            </div>
+            <h2 class="fw-bold mb-1 text-light">{{ stats.total_customers }}</h2>
+            <div class="text-secondary small">
+                <i class="fa-solid fa-arrow-trend-up me-1 text-success"></i> Registered accounts
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Deposits -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card glass-panel card-kpi green p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-secondary fw-semibold">Today's Deposits</span>
+                <span class="fs-4 text-success"><i class="fa-solid fa-arrow-down-long"></i></span>
+            </div>
+            <h2 class="fw-bold mb-1 text-light">₹{{ "{:,.2f}".format(stats.today_deposits) }}</h2>
+            <div class="text-secondary small">
+                <i class="fa-solid fa-clock me-1"></i> NumPy real-time calculation
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Withdrawals -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card glass-panel card-kpi pink p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-secondary fw-semibold">Today's Withdrawals</span>
+                <span class="fs-4 text-pink"><i class="fa-solid fa-arrow-up-long"></i></span>
+            </div>
+            <h2 class="fw-bold mb-1 text-light">₹{{ "{:,.2f}".format(stats.today_withdrawals) }}</h2>
+            <div class="text-secondary small">
+                <i class="fa-solid fa-clock me-1"></i> NumPy real-time calculation
+            </div>
+        </div>
+    </div>
+
+    <!-- Fraud Alerts -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card glass-panel card-kpi red p-4 h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="text-secondary fw-semibold">Fraud Alerts</span>
+                <span class="fs-4 text-danger"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            </div>
+            <h2 class="fw-bold mb-1 text-danger">{{ stats.fraud_alerts }}</h2>
+            <div class="text-secondary small">
+                <i class="fa-solid fa-bell me-1 text-danger"></i> High risk activity flagged
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs for Navigation -->
+<div class="row">
+    <div class="col-12">
+        <div class="card glass-panel p-4 mb-4">
+            <ul class="nav nav-tabs border-bottom-0 mb-4" id="managerTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active bg-transparent border-0 fs-5 fw-bold px-3 py-2" id="customers-tab" data-bs-toggle="tab" data-bs-target="#customers" type="button" role="tab" aria-controls="customers" aria-selected="true">
+                        <i class="fa-solid fa-users-viewfinder me-2"></i>Customers
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link bg-transparent border-0 fs-5 fw-bold px-3 py-2" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions" aria-selected="false">
+                        <i class="fa-solid fa-list-check me-2"></i>Transactions
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link bg-transparent border-0 fs-5 fw-bold px-3 py-2" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts" type="button" role="tab" aria-controls="alerts" aria-selected="false">
+                        <i class="fa-solid fa-circle-exclamation me-2 text-danger"></i>Fraud Alerts
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="managerTabContent">
+                <!-- Customers Tab -->
+                <div class="tab-pane fade show active" id="customers" role="tabpanel" aria-labelledby="customers-tab">
+                    <div class="table-responsive">
+                        <table class="table table-glass align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Balance</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customers %}
+                                <tr>
+                                    <td>#{{ customer.id }}</td>
+                                    <td class="fw-semibold">{{ customer.full_name }}</td>
+                                    <td>{{ customer.email }}</td>
+                                    <td>₹{{ "{:,.2f}".format(customer.balance) }}</td>
+                                    <td>
+                                        {% if customer.status == 'active' %}
+                                            <span class="badge badge-glass badge-glass-success">Active</span>
+                                        {% else %}
+                                            <span class="badge badge-glass badge-glass-danger">Blocked</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-premium btn-premium-secondary btn-sm" onclick="alert('Account blocking action will be implemented in future tasks.')">
+                                            <i class="fa-solid fa-ban me-1 text-danger"></i> Block
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-secondary">No customers registered in the database.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Transactions Tab -->
+                <div class="tab-pane fade" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+                    {% if all_transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-glass align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Type</th>
+                                    <th>Sender</th>
+                                    <th>Receiver</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for txn in all_transactions %}
+                                <tr>
+                                    <td class="text-info fw-semibold">{{ txn.transaction_id }}</td>
+                                    <td>
+                                        {% if txn.transaction_type == 'deposit' %}
+                                            <span class="badge bg-success bg-opacity-25 text-success"><i class="fa-solid fa-arrow-down me-1"></i>Deposit</span>
+                                        {% elif txn.transaction_type == 'withdraw' %}
+                                            <span class="badge bg-warning bg-opacity-25 text-warning"><i class="fa-solid fa-arrow-up me-1"></i>Withdraw</span>
+                                        {% else %}
+                                            <span class="badge bg-info bg-opacity-25 text-info"><i class="fa-solid fa-paper-plane me-1"></i>Transfer</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ txn.sender_name or '—' }}</td>
+                                    <td>{{ txn.receiver_name or '—' }}</td>
+                                    <td class="fw-bold text-light">₹{{ "{:,.2f}".format(txn.amount) }}</td>
+                                    <td>
+                                        {% if txn.status == 'success' %}
+                                            <span class="badge badge-glass badge-glass-success">Success</span>
+                                        {% else %}
+                                            <span class="badge badge-glass badge-glass-danger">Failed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-secondary small">{{ txn.transaction_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 text-secondary">
+                        <div class="fs-1 mb-3">📜</div>
+                        <p class="mb-0">No transactions recorded in the system yet.</p>
+                        <small class="d-block mt-1">Transactions will appear here once customers perform deposits, withdrawals, or transfers.</small>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Fraud Alerts Tab -->
+                <div class="tab-pane fade" id="alerts" role="tabpanel" aria-labelledby="alerts-tab">
+                    {% if fraud_alerts_list %}
+                    <div class="table-responsive">
+                        <table class="table table-glass align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Alert ID</th>
+                                    <th>Customer</th>
+                                    <th>Account</th>
+                                    <th>Transaction</th>
+                                    <th>Alert Type</th>
+                                    <th>Description</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for alert in fraud_alerts_list %}
+                                <tr>
+                                    <td class="text-danger fw-semibold">#{{ alert.id }}</td>
+                                    <td class="fw-semibold">{{ alert.full_name or 'Unknown' }}</td>
+                                    <td class="text-info">{{ alert.account_number or '—' }}</td>
+                                    <td class="text-info small">{{ alert.transaction_id or '—' }}</td>
+                                    <td>
+                                        <span class="badge bg-danger bg-opacity-25 text-danger">
+                                            <i class="fa-solid fa-triangle-exclamation me-1"></i>{{ alert.alert_type }}
+                                        </span>
+                                    </td>
+                                    <td class="text-secondary small">{{ alert.description or '—' }}</td>
+                                    <td class="text-secondary small">{{ alert.alert_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 text-secondary">
+                        <div class="fs-1 mb-3">🚨</div>
+                        <p class="mb-0">System secure. No fraud alerts flagged.</p>
+                    </div>
+                    {% endif %}
+                </div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Transfer Money - SecureBank{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <!-- Back Navigation -->
+    <div class="col-lg-8 mb-3">
+        <a href="{{ url_for('customer_dashboard') }}" class="btn btn-premium btn-premium-secondary btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Transfer Form -->
+    <div class="col-lg-8">
+        <div class="card glass-panel p-4 p-md-5">
+            <div class="text-center mb-4">
+                <div class="txn-icon-circle txn-icon-transfer mx-auto mb-3">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <h2 class="fw-bold text-light">Transfer Money</h2>
+                <p class="text-secondary mb-0">Send funds to another customer</p>
+            </div>
+
+            <!-- Current Balance Display -->
+            <div class="balance-strip mb-4">
+                <div class="d-flex justify-content-between w-100">
+                    <div>
+                        <span class="text-secondary"><i class="fa-solid fa-wallet me-2"></i>Your Balance</span>
+                        <span class="fw-bold fs-5 ms-2">₹{{ "{:,.2f}".format(balance) }}</span>
+                    </div>
+                    <div>
+                        <span class="text-secondary"><i class="fa-solid fa-id-card me-2"></i>Your Account</span>
+                        <span class="fw-bold fs-6 ms-2 text-info">{{ account_number }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if result %}
+            <!-- Success Result Card -->
+            <div class="result-card result-card-success mb-4 animate-fade-in">
+                <div class="text-center">
+                    <div class="result-icon mb-3">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Transfer Successful!</h4>
+                    <p class="text-secondary mb-3">Your money has been sent</p>
+                    <div class="result-amount mb-2">₹{{ "{:,.2f}".format(result.amount) }}</div>
+                    <p class="mb-3 text-secondary">
+                        To <strong class="text-light">{{ result.receiver_name }}</strong>
+                        <span class="text-info">({{ result.receiver_account }})</span>
+                    </p>
+                    <div class="row g-3 justify-content-center">
+                        <div class="col-auto">
+                            <div class="result-detail">
+                                <span class="label">Your New Balance</span>
+                                <span class="value">₹{{ "{:,.2f}".format(result.sender_new_balance) }}</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="result-detail">
+                                <span class="label">Reference ID</span>
+                                <span class="value">{{ result.transaction_id }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('transfer_page') }}" id="transferForm">
+                <!-- Receiver Account -->
+                <div class="mb-4">
+                    <label for="receiver_account" class="form-label text-secondary fw-semibold">
+                        <i class="fa-solid fa-user me-1"></i> Receiver Account Number
+                    </label>
+                    <input type="text" class="form-control form-glass" id="receiver_account" name="receiver_account"
+                           placeholder="e.g. ACC1002" required>
+                    <div class="form-text text-secondary mt-1">
+                        <i class="fa-solid fa-circle-info me-1"></i> Enter the recipient's account number
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div class="mb-4">
+                    <label for="amount" class="form-label text-secondary fw-semibold">
+                        <i class="fa-solid fa-indian-rupee-sign me-1"></i> Amount
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text form-glass border-end-0 fw-bold">₹</span>
+                        <input type="number" class="form-control form-glass border-start-0" id="amount" name="amount"
+                               placeholder="Enter amount" min="1" step="0.01" required>
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="mb-4">
+                    <label for="category" class="form-label text-secondary fw-semibold">
+                        <i class="fa-solid fa-tag me-1"></i> Category
+                    </label>
+                    <select class="form-select form-glass" id="category" name="category">
+                        <option value="Transfer">Transfer</option>
+                        <option value="Bills">Bills</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Remarks -->
+                <div class="mb-4">
+                    <label for="remarks" class="form-label text-secondary fw-semibold">
+                        <i class="fa-solid fa-comment me-1"></i> Remarks <span class="text-secondary fw-normal">(Optional)</span>
+                    </label>
+                    <textarea class="form-control form-glass" id="remarks" name="remarks" rows="2"
+                              placeholder="Add a note for this transfer..."></textarea>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-premium btn-premium-indigo w-100 py-3 fs-5">
+                    <i class="fa-solid fa-paper-plane me-2"></i> Transfer
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,464 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #2e1065 100%);
+    --glass-bg: rgba(30, 41, 59, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-blue: #38bdf8;
+    --accent-indigo: #818cf8;
+    --accent-pink: #f472b6;
+    --accent-green: #34d399;
+    --accent-red: #f87171;
+    --glow-blue: 0 0 15px rgba(56, 189, 248, 0.4);
+    --glow-indigo: 0 0 15px rgba(129, 140, 248, 0.4);
+    --glow-pink: 0 0 15px rgba(244, 114, 182, 0.4);
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Custom Navbar */
+.navbar-glass {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-primary) !important;
+}
+
+.nav-link {
+    color: var(--text-secondary) !important;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--accent-blue) !important;
+    text-shadow: var(--glow-blue);
+}
+
+/* Card Styling */
+.card-kpi {
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-kpi::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+}
+
+.card-kpi.blue::before { background: var(--accent-blue); }
+.card-kpi.indigo::before { background: var(--accent-indigo); }
+.card-kpi.pink::before { background: var(--accent-pink); }
+.card-kpi.green::before { background: var(--accent-green); }
+.card-kpi.red::before { background: var(--accent-red); }
+
+/* Buttons */
+.btn-premium {
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.btn-premium-primary {
+    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-indigo) 100%);
+    color: #0f172a;
+}
+
+.btn-premium-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-blue);
+    opacity: 0.95;
+    color: #0f172a;
+}
+
+.btn-premium-secondary {
+    background: transparent;
+    border-color: var(--glass-border);
+    color: var(--text-primary);
+}
+
+.btn-premium-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-decoration: none;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-action-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent-blue);
+    transform: translateY(-4px);
+    color: var(--accent-blue);
+    box-shadow: var(--glow-blue);
+}
+
+.btn-action-card i {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+/* Form Controls */
+.form-glass {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.form-glass:focus {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: var(--accent-blue);
+    box-shadow: var(--glow-blue);
+    color: var(--text-primary);
+}
+
+.form-glass::placeholder {
+    color: var(--text-secondary);
+}
+
+select.form-glass option {
+    background-color: #1e1b4b;
+    color: var(--text-primary);
+}
+
+/* Tables */
+.table-glass {
+    color: var(--text-primary) !important;
+}
+
+.table-glass th {
+    border-bottom: 2px solid var(--glass-border) !important;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.table-glass td {
+    border-bottom: 1px solid var(--glass-border) !important;
+    vertical-align: middle;
+}
+
+/* Badges */
+.badge-glass {
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.badge-glass-success {
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--accent-green);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.badge-glass-danger {
+    background: rgba(248, 113, 113, 0.15);
+    color: var(--accent-red);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* ── Transaction Module Styles ──────────────────────────────── */
+
+/* Transaction Icon Circles */
+.txn-icon-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.txn-icon-circle:hover {
+    transform: scale(1.1);
+}
+
+.txn-icon-deposit {
+    background: rgba(52, 211, 153, 0.15);
+    color: var(--accent-green);
+    border: 2px solid rgba(52, 211, 153, 0.3);
+    box-shadow: 0 0 20px rgba(52, 211, 153, 0.15);
+}
+
+.txn-icon-withdraw {
+    background: rgba(244, 114, 182, 0.15);
+    color: var(--accent-pink);
+    border: 2px solid rgba(244, 114, 182, 0.3);
+    box-shadow: 0 0 20px rgba(244, 114, 182, 0.15);
+}
+
+.txn-icon-transfer {
+    background: rgba(129, 140, 248, 0.15);
+    color: var(--accent-indigo);
+    border: 2px solid rgba(129, 140, 248, 0.3);
+    box-shadow: 0 0 20px rgba(129, 140, 248, 0.15);
+}
+
+/* Balance Strip */
+.balance-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: rgba(56, 189, 248, 0.06);
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    border-radius: 12px;
+    color: var(--text-primary);
+}
+
+/* Result Card */
+.result-card {
+    padding: 32px 24px;
+    border-radius: 16px;
+    border: 1px solid;
+}
+
+.result-card-success {
+    background: rgba(52, 211, 153, 0.06);
+    border-color: rgba(52, 211, 153, 0.2);
+}
+
+.result-icon {
+    font-size: 3rem;
+    color: var(--accent-green);
+    animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.result-amount {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.result-detail {
+    text-align: center;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+}
+
+.result-detail .label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.result-detail .value {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+/* Transaction Type Badges */
+.badge-txn {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.3px;
+}
+
+.badge-txn-deposit {
+    background: rgba(52, 211, 153, 0.12);
+    color: var(--accent-green);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.badge-txn-withdraw {
+    background: rgba(244, 114, 182, 0.12);
+    color: var(--accent-pink);
+    border: 1px solid rgba(244, 114, 182, 0.25);
+}
+
+.badge-txn-transfer {
+    background: rgba(129, 140, 248, 0.12);
+    color: var(--accent-indigo);
+    border: 1px solid rgba(129, 140, 248, 0.25);
+}
+
+/* Colored Text Helpers */
+.text-pink { color: var(--accent-pink) !important; }
+.text-indigo { color: var(--accent-indigo) !important; }
+
+/* Extra Button Variants */
+.btn-premium-pink {
+    background: linear-gradient(135deg, var(--accent-pink) 0%, #e879a8 100%);
+    color: #1e1b4b;
+}
+
+.btn-premium-pink:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-pink);
+    opacity: 0.95;
+    color: #1e1b4b;
+}
+
+.btn-premium-indigo {
+    background: linear-gradient(135deg, var(--accent-indigo) 0%, #6366f1 100%);
+    color: #0f172a;
+}
+
+.btn-premium-indigo:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-indigo);
+    opacity: 0.95;
+    color: #0f172a;
+}
+
+/* Input Group Fix for Glass Inputs */
+.input-group .form-glass {
+    border-radius: 8px;
+}
+
+.input-group .input-group-text.form-glass {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .form-control.form-glass.border-start-0 {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Tab styling for filter nav */
+.nav-tabs .nav-link {
+    color: var(--text-secondary) !important;
+    border: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--accent-blue) !important;
+    border-bottom-color: rgba(56, 189, 248, 0.3);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--accent-blue) !important;
+    border-bottom-color: var(--accent-blue);
+    background: transparent !important;
+}
+
+/* Analytics Dark Mode */
+.dark-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0;
+}
+.dark-mode .card,
+.dark-mode .bg-white,
+.dark-mode .bg-light {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode .table {
+    color: #e0e0e0;
+}
+.dark-mode .table-hover tbody tr:hover {
+    background-color: #2a2a2a;
+    color: #fff;
+}
+.dark-mode .text-muted {
+    color: #aaa !important;
+}
+.dark-mode .card-header {
+    border-bottom: 1px solid #333;
+}
+
+/* ── Google Sign-In Button (Official Branding) ──────────────── */
+.btn-google-signin {
+    background: #ffffff;
+    border: 1px solid #dadce0;
+    border-radius: 40px;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.btn-google-signin:hover {
+    background: #f7f8f8;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    border-color: #c6c6c6;
+}
+
+.btn-google-signin:active {
+    transform: translateY(0);
+    background: #eee;
+}

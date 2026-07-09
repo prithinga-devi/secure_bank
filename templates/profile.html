@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - SecureBank{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card glass-panel p-5">
+            <h2 class="fw-bold text-light mb-4"><i class="fa-solid fa-user-circle me-2"></i>My Profile</h2>
+            
+            <div class="row mb-3">
+                <div class="col-sm-4 text-secondary">Full Name</div>
+                <div class="col-sm-8 text-light fw-bold fs-5">{{ user.full_name }}</div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-sm-4 text-secondary">Email Address</div>
+                <div class="col-sm-8 text-light">{{ user.email }}</div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-sm-4 text-secondary">Role</div>
+                <div class="col-sm-8 text-light text-capitalize">
+                    {% if user.role == 'manager' %}
+                        <span class="badge bg-warning text-dark"><i class="fa-solid fa-user-tie me-1"></i> Manager</span>
+                    {% else %}
+                        <span class="badge bg-info text-dark"><i class="fa-solid fa-user me-1"></i> Customer</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if user.role == 'customer' %}
+            <div class="row mb-3">
+                <div class="col-sm-4 text-secondary">Account Number</div>
+                <div class="col-sm-8 text-info fw-bold">{{ user.account_number }}</div>
+            </div>
+            {% endif %}
+            
+            {% if user.role == 'manager' %}
+            <div class="row mb-3">
+                <div class="col-sm-4 text-secondary">Employee ID</div>
+                <div class="col-sm-8 text-warning fw-bold">{{ user.employee_id }}</div>
+            </div>
+            {% endif %}
+
+            <div class="row mb-3">
+                <div class="col-sm-4 text-secondary">Account Status</div>
+                <div class="col-sm-8">
+                    {% if user.status == 'active' %}
+                        <span class="text-success fw-bold"><i class="fa-solid fa-check-circle me-1"></i> Active</span>
+                    {% else %}
+                        <span class="text-danger fw-bold"><i class="fa-solid fa-ban me-1"></i> {{ user.status | title }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-sm-4 text-secondary">Last Login</div>
+                <div class="col-sm-8 text-light">{{ user.last_login or 'Never' }}</div>
+            </div>
+            
+            <div class="mt-4 pt-3 border-top border-secondary">
+                <a href="{{ url_for('customer_dashboard') if session.get('role') == 'customer' else url_for('manager_dashboard') }}" class="btn btn-outline-light">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
