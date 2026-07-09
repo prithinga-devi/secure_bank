@@ -27,7 +27,8 @@ def home():
             return redirect(url_for('customer_dashboard'))
         elif session.get('role') == 'manager':
             return redirect(url_for('manager_dashboard'))
-    return redirect(url_for('login'))
+    # Show landing page for guests
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
