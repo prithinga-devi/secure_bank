@@ -318,7 +318,7 @@
     });
 
     // Fetch and render charts
-    fetch("{{ url_for('api_analytics_data') }}")
+    fetch("{{ BACKEND_BASE_URL }}{{ url_for('api_analytics_data') }}")
         .then(response => response.json())
         .then(data => {
             // Daily Chart

@@ -1,22 +1,35 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort
 from datetime import timedelta
-from utils.auth import login_required, role_required
-from models.user import authenticate_manager, authenticate_google_user, get_user_by_id, get_all_users_by_role
-from models.transaction import deposit, withdraw, transfer, get_transaction_history, get_recent_transactions
+
+from flask import Flask, Response, abort, flash, jsonify, redirect, render_template, request, session, url_for
+from flask_cors import CORS
+
 from analytics.daily import get_dashboard_stats, get_last_7_days_stats, get_numpy_statistics
 from analytics.monthly import get_monthly_analytics, get_top_customers, get_biggest_transactions, get_inactive_customers, get_peak_banking_hours
 from analytics.reports import export_csv, export_excel, export_pdf
-from flask import Response, jsonify
+from models.transaction import deposit, withdraw, transfer, get_transaction_history, get_recent_transactions
+from models.user import authenticate_google_user, authenticate_manager, get_all_users_by_role, get_user_by_id
+from utils.auth import login_required, role_required
 
 # Auto-initialize database if missing
 if not os.path.exists('database.db'):
     from init_db import init_db
     init_db()
 
+BACKEND_BASE_URL = os.environ.get('BACKEND_BASE_URL', 'https://secure-bank-dev8.onrender.com').rstrip('/')
+
 app = Flask(__name__)
-app.secret_key = 'smart_banking_secure_key_1984'
+app.secret_key = os.environ.get('SECRET_KEY', 'smart_banking_secure_key_1984')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('FLASK_ENV') != 'development'
+app.config['SESSION_COOKIE_SAMESITE'] = 'None' if os.environ.get('FLASK_ENV') != 'development' else 'Lax'
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+
+CORS(app, resources={r'/*': {'origins': '*'}}, supports_credentials=True)
+
+@app.context_processor
+def inject_backend_config():
+    return {'BACKEND_BASE_URL': BACKEND_BASE_URL}
 
 @app.before_request
 def make_session_permanent():
@@ -342,4 +355,4 @@ def export_report(format):
     flash("Invalid format requested.", "danger")
     return redirect(url_for('analytics_dashboard'))
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=True, port=int(os.environ.get('PORT', 5000)))
